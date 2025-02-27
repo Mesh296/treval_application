@@ -1,5 +1,6 @@
 // main.dart
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'home_page.dart';
 import 'trip_page.dart';
 import 'profile_page.dart';
@@ -14,6 +15,9 @@ class TravelPlannerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        textTheme: GoogleFonts.nunitoTextTheme(),
+      ),
       home: MainScreen(),
     );
   }

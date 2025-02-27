@@ -1,5 +1,6 @@
 //profile_page
 import 'package:flutter/material.dart';
+import 'package:treval_application/sign_in_page.dart'; // Replace with your app's package name
 
 class ProfilePage extends StatelessWidget {
   @override
@@ -11,27 +12,38 @@ class ProfilePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 40,
                 backgroundImage: AssetImage("assets/images/profile_pic.jpg"),
               ),
-              const SizedBox(height: 10),
-              const Text("Tran Duc Minh",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {},
-                child: const Text("Edit Profile"),
+              SizedBox(height: 10),
+              Text(
+                "Tran Duc Minh",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 20),
-              const Text("My Posts",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              // Add a Grid/ListView for posts
-              const Spacer(),
+              SizedBox(height: 10),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  // Add edit profile logic here
+                },
+                child: Text("Edit Profile"),
+              ),
+              SizedBox(height: 20),
+              Text(
+                "My Posts",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              ElevatedButton(
+                onPressed: () {
+                  // Logout function
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => SignInPage()),
+                  );
+                },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: const Text("LOG OUT"),
+                child: Text("LOG OUT"),
               ),
             ],
           ),

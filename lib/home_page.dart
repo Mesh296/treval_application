@@ -1,5 +1,6 @@
 //home_page
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -32,13 +33,20 @@ class HomePage extends StatelessWidget {
               ),
             ),
             // For You section
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("For You", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                  Text("See All >", style: TextStyle(color: Colors.blue, fontSize: 16)),
+                  Text(
+                    "For You",
+                    style: GoogleFonts.nunito(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text("See All >",
+                      style: TextStyle(color: Colors.blue, fontSize: 16)),
                 ],
               ),
             ),
@@ -50,9 +58,12 @@ class HomePage extends StatelessWidget {
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                   children: [
-                    _buildRecommendationCard("Moscow, Russia", "assets/images/moscow.jpg"),
-                    _buildRecommendationCard("Hoi An, Vietnam", "assets/images/hoi_an.jpg"),
-                    _buildRecommendationCard("Nha Trang, Vietnam", "assets/images/nha_trang.jpg"),
+                    _buildRecommendationCard(
+                        "Moscow, Russia", "assets/images/moscow.jpg"),
+                    _buildRecommendationCard(
+                        "Hoi An, Vietnam", "assets/images/hoi_an.jpg"),
+                    _buildRecommendationCard(
+                        "Nha Trang, Vietnam", "assets/images/nha_trang.jpg"),
                   ],
                 ),
               ),
@@ -63,8 +74,15 @@ class HomePage extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Hot Places", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                  Text("See All >", style: TextStyle(color: Colors.blue, fontSize: 16)),
+                  Text(
+                    "Hot Places",
+                    style: GoogleFonts.nunito(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text("See All >",
+                      style: TextStyle(color: Colors.blue, fontSize: 16)),
                 ],
               ),
             ),
@@ -76,8 +94,10 @@ class HomePage extends StatelessWidget {
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                   children: [
-                    _buildHotPlaceCard("Seoul, Korea", "assets/images/seoul.jpg"),
-                    _buildHotPlaceCard("Paris, France", "assets/images/paris.jpg"),
+                    _buildHotPlaceCard(
+                        "Seoul, Korea", "assets/images/seoul.jpg"),
+                    _buildHotPlaceCard(
+                        "Paris, France", "assets/images/paris.jpg"),
                   ],
                 ),
               ),
@@ -107,7 +127,8 @@ class HomePage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(location, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            child: Text(location,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),
           ),
         ],
       ),
@@ -133,10 +154,12 @@ class HomePage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(location, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            child: Text(location,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),
           ),
         ],
       ),
     );
   }
 }
+
