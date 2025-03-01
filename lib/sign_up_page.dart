@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:treval_application/main.dart'; // Replace with your app's package name
-import 'package:treval_application/sign_in_page.dart'; // Replace with your app's package name
+import 'package:treval_application/main.dart'; 
+import 'package:treval_application/sign_in_page.dart'; 
 
 class SignUpPage extends StatelessWidget {
   final TextEditingController nameController = TextEditingController();
