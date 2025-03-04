@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class UserApi {
-  static const String baseUrl = 'https://api-jxzcqxilwa-uc.a.run.app';
+  static const String baseUrl =;
   static const _storage = FlutterSecureStorage();
 
   Future<String?> _getToken() async {
