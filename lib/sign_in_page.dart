@@ -1,10 +1,49 @@
+// sign_in.dart (remains mostly the same, only imports change)
 import 'package:flutter/material.dart';
 import 'package:treval_application/main.dart';
 import 'package:treval_application/sign_up_page.dart';
+import '../services/auth.dart';
 
-class SignInPage extends StatelessWidget {
+class SignInPage extends StatefulWidget {
+  const SignInPage({super.key});
+
+  @override
+  _SignInPageState createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final AuthApi _authApi = AuthApi();
+  bool _isLoading = false;
+
+  Future<void> _signIn() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await _authApi.signIn(
+        emailController.text,
+        passwordController.text,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sign in successful!')),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => MainScreen()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sign in failed: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,11 +54,11 @@ class SignInPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 "SIGN IN",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextField(
                 controller: emailController,
                 decoration: InputDecoration(
@@ -31,7 +70,7 @@ class SignInPage extends StatelessWidget {
                   fillColor: Colors.grey[200],
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextField(
                 controller: passwordController,
                 decoration: InputDecoration(
@@ -44,34 +83,29 @@ class SignInPage extends StatelessWidget {
                 ),
                 obscureText: true,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  // Simulate successful sign in
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => MainScreen()),
-                  );
-                },
+                onPressed: _isLoading ? null : _signIn,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF0037CF), // Blue color #0037CF
-                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 80),
+                  backgroundColor: const Color(0xFF0037CF),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 80),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: Text(
-                  "SIGN IN",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        "SIGN IN",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
               ),
-              SizedBox(height: 10),
-              
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Don't have an account?"),
+                  const Text("Don't have an account?"),
                   TextButton(
                     onPressed: () {
                       Navigator.pushReplacement(
@@ -79,7 +113,7 @@ class SignInPage extends StatelessWidget {
                         MaterialPageRoute(builder: (_) => SignUpPage()),
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       "SIGN UP",
                       style: TextStyle(color: Color(0xFF0037CF)),
                     ),
