@@ -4,8 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthApi {
-  static const String baseUrl = 'https://api-jxzcqxilwa-uc.a.run.app';
-  static const String firebaseApiKey = 'AIzaSyCoxgxZxXHoTfLVVfadV6dEmTKkgAmqR68';
+  static const String baseUrl =;
+  static const String firebaseApiKey = ;
   static const _storage = FlutterSecureStorage();
 
   Future<void> _saveToken(String token) async {
