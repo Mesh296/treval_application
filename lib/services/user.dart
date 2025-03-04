@@ -210,27 +210,25 @@ class UserApi {
     }
   }
 
-  // Add an activity to user's liked activities
-  Future<void> addActivity(String activityId) async {
-    final token = await _getToken();
-    if (token == null) {
-      throw Exception('No token found. Please sign in.');
-    }
-
-    final response = await http.post(
-      Uri.parse('$baseUrl/users/activities'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode({'activity_id': activityId}),
-    );
-    print(response.statusCode);
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to add liked activity (API): ${response.body}');
-    }
+Future<void> addActivities(List<String> activityIds) async {
+  final token = await _getToken();
+  if (token == null) {
+    throw Exception('No token found. Please sign in.');
   }
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/users/activities/replace'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: jsonEncode({'activity_ids': activityIds}), // Gửi danh sách thay vì một ID
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception('Failed to add liked activities: ${response.body}');
+  }
+}
 
   // Remove an activity from user's liked activities
   Future<void> removeLikedActivity(String activityId) async {

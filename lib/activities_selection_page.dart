@@ -23,48 +23,35 @@ class _ActivitiesSelectionPageState extends State<ActivitiesSelectionPage> {
   }
 
   Future<void> _fetchActivities() async {
-    setState(() => _isLoading = true);
-    try {
-      final activities = await _userApi.getActivities();
-      setState(() {
-        _activities = activities;
-        _isLoading = false;
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load activities: ${e.toString()}')),
-      );
-      setState(() => _isLoading = false);
-    }
+  setState(() => _isLoading = true);
+  try {
+    final activities = await _userApi.getActivities();
+    final userActivities = await _userApi.getMe(); // Lấy thông tin user, bao gồm danh sách activities đã chọn trước đó
+
+    setState(() {
+      _activities = activities;
+      _selectedActivities = Set<String>.from(userActivities['activities']?.map((a) => a['activity_id'].toString()) ?? []);
+      _isLoading = false;
+    });
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to load activities: ${e.toString()}')),
+    );
+    setState(() => _isLoading = false);
   }
+}
+
 
 Future<void> _saveSelections() async {
   setState(() => _isSaving = true);
-  bool allSaved = true;
 
   try {
-    for (String activityId in _selectedActivities) {
-      try {
-        await _userApi.addActivity(activityId);
-      } catch (e) {
-        if (e.toString().contains("Activity already linked to this user")) {
-          // Handle the case where the activity is already linked
-          continue;
-        } else {
-          allSaved = false;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to save activity $activityId: ${e.toString()}')),
-          );
-        }
-      }
-    }
+    await _userApi.addActivities(_selectedActivities.toList()); // Gửi danh sách thay vì từng cái một
 
-    if (allSaved) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Activities saved successfully!')),
-      );
-      Navigator.pop(context); // Return to ProfilePage
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Activities saved successfully!')),
+    );
+    Navigator.pop(context); // Quay lại trang trước
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Failed to save activities: ${e.toString()}')),
@@ -75,6 +62,7 @@ Future<void> _saveSelections() async {
     }
   }
 }
+
 
   @override
   Widget build(BuildContext context) {

@@ -1,10 +1,10 @@
-// profile_page.dart
 import 'package:flutter/material.dart';
 import 'package:treval_application/sign_in_page.dart';
 import 'package:treval_application/activities_selection_page.dart';
 import '../services/auth.dart';
 import '../services/user.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -105,139 +105,198 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        elevation: 0,
-        backgroundColor: const Color(0xFF0037CF),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ActivitiesSelectionPage()),
-              );
-            },
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: _fetchUserData,
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              CircleAvatar(
-                                radius: 50,
-                                backgroundColor: Colors.grey[200],
-                                backgroundImage: const AssetImage(
-                                    "assets/images/profile_pic.jpg"),
-                                onBackgroundImageError: (_, __) =>
-                                    const Icon(Icons.person, size: 50),
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                _userData?['name'] ?? 'Unnamed User',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                '@${_userData?['username'] ?? 'unknown'}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(
-                                      color: Colors.grey[600],
-                                    ),
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: _fetchUserData,
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.05, // 5% of screen width
+                      vertical: screenHeight * 0.02, // 2% of screen height
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // User Information Section
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Avatar
+                            CircleAvatar(
+                              radius: screenWidth * 0.12, // 12% of screen width
+                              backgroundColor: Colors.grey[200],
+                              backgroundImage: const AssetImage(
+                                  "assets/images/profile_pic.jpg"),
+                              onBackgroundImageError: (_, __) =>
+                                  const Icon(Icons.person, size: 40),
+                            ),
+                            SizedBox(
+                                width:
+                                    screenWidth * 0.04), // 4% of screen width
+                            // Name and Username
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.email_outlined,
-                                      color: Colors.grey),
-                                  const SizedBox(width: 8),
                                   Text(
-                                    _userData?['email'] ?? 'No email',
+                                    _userData?['name'] ?? 'Unnamed User',
                                     style: Theme.of(context)
                                         .textTheme
-                                        .bodyMedium
+                                        .headlineSmall
                                         ?.copyWith(
-                                          color: Colors.black54,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: screenWidth *
+                                              0.06, // 6% of screen width
                                         ),
                                   ),
+                                  SizedBox(
+                                      height: screenHeight *
+                                          0.005), // 0.5% of screen height
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.email_outlined,
+                                          color: Colors.grey),
+                                      SizedBox(width: screenWidth * 0.02),
+                                      Text(
+                                        '${_userData?['email'] ?? 'unknown'}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                              color: Colors.grey[600],
+                                              fontSize: screenWidth *
+                                                  0.04, // 4% of screen width
+                                            ),
+                                      ),
+                                    ],
+                                  )
                                 ],
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Joined: ${_formatCreatedAt(_userData?['createdAt'])}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                      color: Colors.grey[600],
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'My Activities',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
                             ),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildActivitiesList(),
-                      const SizedBox(height: 24),
-                      ElevatedButton.icon(
-                        onPressed: _isLoggingOut ? null : () => _logout(context),
-                        icon: _isLoggingOut
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.logout),
-                        label: const Text('Log Out'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12, horizontal: 24),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                          ],
+                        ),
+                        SizedBox(
+                            height: screenHeight * 0.02), // 2% of screen height
+                  
+                        SizedBox(
+                            height: screenHeight * 0.01), // 1% of screen height
+                        Text(
+                          'Joined: ${_formatCreatedAt(_userData?['createdAt'])}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                color: Colors.grey[600],
+                                fontSize:
+                                    screenWidth * 0.03, // 3% of screen width
+                              ),
+                        ),
+                        SizedBox(
+                            height: screenHeight * 0.03), // 3% of screen height
+                        // Edit Favorite Activities Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) =>
+                                        const ActivitiesSelectionPage()),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF0037CF),
+                              padding: EdgeInsets.symmetric(
+                                vertical:
+                                    screenHeight * 0.02, // 2% of screen height
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              "EDIT ACTIVITIES",
+                              style: GoogleFonts.nunito(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+
+                        SizedBox(
+                            height: screenHeight * 0.03), // 3% of screen height
+                        // My Activities Section
+                        Text(
+                          'My Activities',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize:
+                                    screenWidth * 0.05, // 5% of screen width
+                              ),
+                        ),
+                        SizedBox(
+                            height: screenHeight * 0.02), // 2% of screen height
+                        _buildActivitiesList(),
+                        SizedBox(
+                            height: screenHeight * 0.03), // 3% of screen height
+                        // Log Out Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed:
+                                _isLoggingOut ? null : () => _logout(context),
+                            icon: _isLoggingOut
+                                ? SizedBox(
+                                    width: screenWidth *
+                                        0.05, // 5% of screen width
+                                    height: screenWidth *
+                                        0.05, // 5% of screen width
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.logout,
+                                    size: screenWidth * 0.05,
+                                    color: Colors.white,
+                                  ),
+                            label: Text(
+                              "LOGOUT",
+                              style: GoogleFonts.nunito(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              padding: EdgeInsets.symmetric(
+                                vertical:
+                                    screenHeight * 0.02, // 2% of screen height
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
+        ),
       ),
     );
   }
@@ -247,12 +306,15 @@ class _ProfilePageState extends State<ProfilePage> {
     if (activities == null || activities.isEmpty) {
       return Card(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(
+              MediaQuery.of(context).size.width * 0.04), // 4% of screen width
           child: Center(
             child: Text(
               'No activities yet.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.grey,
+                    fontSize: MediaQuery.of(context).size.width *
+                        0.04, // 4% of screen width
                   ),
             ),
           ),
@@ -267,16 +329,30 @@ class _ProfilePageState extends State<ProfilePage> {
       itemBuilder: (context, index) {
         final activity = activities[index];
         return Card(
-          margin: const EdgeInsets.symmetric(vertical: 4),
+          margin: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height *
+                  0.01), // 1% of screen height
           child: ListTile(
             leading: const Icon(Icons.event, color: Color(0xFF0037CF)),
-            title: Text(activity['name'] ?? 'Unnamed Activity'),
+            title: Text(
+              activity['name'] ?? 'Unnamed Activity',
+              style: TextStyle(
+                fontSize: MediaQuery.of(context).size.width *
+                    0.04, // 4% of screen width
+              ),
+            ),
             subtitle: Text(
               'Added: ${_formatActivityDate(activity['created_at'])}',
-              style: Theme.of(context).textTheme.bodySmall,
+              style: TextStyle(
+                fontSize: MediaQuery.of(context).size.width *
+                    0.03, // 3% of screen width
+              ),
             ),
             trailing: IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
+              icon: Icon(Icons.delete_outline,
+                  color: Colors.red,
+                  size: MediaQuery.of(context).size.width *
+                      0.06), // 6% of screen width
               onPressed: () => _removeActivity(activity['activity_id']),
             ),
           ),
