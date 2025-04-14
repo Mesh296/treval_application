@@ -2,9 +2,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class UserApi {
-  static const String baseUrl =;
+  final String baseUrl = dotenv.env['BASE_URL'] ?? 'BASE_URL';
+  final String firebaseApiKey = dotenv.env['FIREBASE_API_KEY'] ?? 'FIREBASE_API_KEY';
   static const _storage = FlutterSecureStorage();
 
   Future<String?> _getToken() async {
@@ -17,6 +19,7 @@ class UserApi {
   }
 
   Future<Map<String, dynamic>> getMe() async {
+    
     final token = await _getToken();
     if (token == null) {
       throw Exception('No token found. Please sign in.');

@@ -2,10 +2,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AuthApi {
-  static const String baseUrl =;
-  static const String firebaseApiKey = ;
+  final String baseUrl = dotenv.env['BASE_URL'] ?? 'BASE_URL';
+  final String firebaseApiKey = dotenv.env['FIREBASE_API_KEY'] ?? 'FIREBASE_API_KEY';
   static const _storage = FlutterSecureStorage();
 
   Future<void> _saveToken(String token) async {
