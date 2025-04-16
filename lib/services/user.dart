@@ -34,6 +34,7 @@ class UserApi {
     );
 
     if (response.statusCode == 200) {
+      print("fetch trips in service--------------------------");
       print(jsonDecode(response.body));
       return jsonDecode(response.body);
     } else {
