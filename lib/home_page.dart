@@ -11,15 +11,19 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final UserApi _userApi = UserApi();
   List<dynamic> _recommendedLocations = [];
+  List<dynamic> _filteredLocations = []; // Danh sách địa điểm sau khi lọc
   List<dynamic> _offers = [];
   Map<String, String> _locationIdToNameMap = {};
   bool _isLoading = true;
   String? _errorMessage;
+  final TextEditingController _searchController = TextEditingController(); // Controller cho ô tìm kiếm
 
   @override
   void initState() {
     super.initState();
     _fetchRecommendedLocations();
+    // Lắng nghe thay đổi trong ô tìm kiếm
+    _searchController.addListener(_onSearchChanged);
   }
 
   Future<void> _fetchRecommendedLocations() async {
@@ -28,6 +32,7 @@ class _HomePageState extends State<HomePage> {
       if (mounted) {
         setState(() {
           _recommendedLocations = response['locations'] ?? [];
+          _filteredLocations = _recommendedLocations; // Khởi tạo danh sách lọc
           _offers = response['offers'] ?? [];
           _locationIdToNameMap = {
             for (var location in _recommendedLocations)
@@ -44,6 +49,20 @@ class _HomePageState extends State<HomePage> {
         });
       }
     }
+  }
+
+  void _onSearchChanged() {
+    String query = _searchController.text.trim().toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        _filteredLocations = _recommendedLocations; // Hiển thị tất cả nếu ô tìm kiếm trống
+      } else {
+        _filteredLocations = _recommendedLocations.where((location) {
+          String locationName = (location['name'] ?? '').toLowerCase();
+          return locationName.contains(query);
+        }).toList();
+      }
+    });
   }
 
   String _getImagePath(String locationName) {
@@ -83,12 +102,21 @@ class _HomePageState extends State<HomePage> {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: TextField(
+                  controller: _searchController,
                   decoration: InputDecoration(
-                    hintText: "Search",
+                    hintText: "Search locations (e.g., Canada)",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                     prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                            },
+                          )
+                        : null,
                   ),
                 ),
               ),
@@ -120,15 +148,15 @@ class _HomePageState extends State<HomePage> {
                     ? Center(child: CircularProgressIndicator())
                     : _errorMessage != null
                         ? Center(child: Text(_errorMessage!))
-                        : _recommendedLocations.isEmpty
-                            ? Center(child: Text("No recommendations available"))
+                        : _filteredLocations.isEmpty
+                            ? Center(child: Text("No locations found"))
                             : GridView.count(
                                 crossAxisCount: 2,
                                 crossAxisSpacing: 10,
                                 mainAxisSpacing: 10,
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
-                                children: _recommendedLocations.map((location) {
+                                children: _filteredLocations.map((location) {
                                   String locationName = location['name'] ?? 'Unknown';
                                   String imagePath = _getImagePath(locationName);
                                   return _buildRecommendationCard(location, locationName, imagePath);
@@ -301,6 +329,12 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 }
 
 class LocationDetailPage extends StatefulWidget {
@@ -327,7 +361,7 @@ class _LocationDetailPageState extends State<LocationDetailPage> {
   final TextEditingController _commentController = TextEditingController();
   bool _isSubmitting = false;
   String? _currentUserId;
-  bool _isDeleting = false; // To manage delete button loading state
+  bool _isDeleting = false;
 
   @override
   void initState() {
@@ -342,8 +376,6 @@ class _LocationDetailPageState extends State<LocationDetailPage> {
       if (mounted) {
         setState(() {
           _currentUserId = userData['id'];
-          print("user ideeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-          print(_currentUserId);
         });
       }
     } catch (e) {
@@ -357,9 +389,7 @@ class _LocationDetailPageState extends State<LocationDetailPage> {
 
   Future<void> _fetchReviews() async {
     try {
-      print('Fetching reviews for location_id: ${widget.location['location_id']}');
       final reviews = await _reviewApi.getReviewsByLocation(widget.location['location_id']);
-      print('Received reviews: $reviews');
       if (mounted) {
         setState(() {
           _reviews = reviews;
@@ -367,7 +397,6 @@ class _LocationDetailPageState extends State<LocationDetailPage> {
         });
       }
     } catch (e) {
-      print('Error fetching reviews: $e');
       if (mounted) {
         setState(() {
           _reviewErrorMessage = 'Failed to load reviews: $e';
@@ -397,10 +426,6 @@ class _LocationDetailPageState extends State<LocationDetailPage> {
     });
 
     try {
-      print('aaaaaaaaaaaaaaaaaaaaaaaa');
-      print(_currentUserId);
-      print(widget.location['location_id']);
-      print(_selectedRating);
       await _reviewApi.postReview(
         userId: _currentUserId!,
         locationId: widget.location['location_id'],
@@ -664,8 +689,6 @@ class _LocationDetailPageState extends State<LocationDetailPage> {
                                                       ),
                                                       onPressed: () {
                                                         _deleteReview(reviewId);
-                                                        print("home delete");
-                                                        print(reviewId);
                                                       },
                                                     ),
                                           ],

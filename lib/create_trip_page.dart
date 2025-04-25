@@ -311,7 +311,7 @@ class _CreateTripPageState extends State<CreateTripPage> {
                               items: _locations.map((location) {
                                 return DropdownMenuItem<String>(
                                   value: location['location_id'],
-                                  child: Text(location['name'] ?? 'Unknown'),
+                                  child: Text(location['name'] ?? ''),
                                 );
                               }).toList(),
                               onChanged: (value) {

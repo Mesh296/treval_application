@@ -1,3 +1,4 @@
+//services/trips.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -176,7 +177,7 @@ class TripApi {
       },
     );
 
-    if (response.statusCode != 204) {
+    if (response.statusCode != 200) {
       throw Exception('Failed to delete trip: ${response.statusCode} - ${response.body}');
     }
   }
